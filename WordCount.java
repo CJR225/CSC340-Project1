@@ -38,7 +38,7 @@ public class WordCount {
 
     public static void main(String[] args) {
         try {
-            System.out.println(wordCount("words.txt"));
+            System.out.println(wordCount("job.txt"));
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
