@@ -1,15 +1,3 @@
-The WordCountServer accepts connections from clients and distributes portions of the text file to them.
-
-Each WordCountClient connects to the server, sends an acknowledgment, and closes the connection.
-
-The WordCountClientHandler receives acknowledgment from the client, processes a portion of the text file, and counts words using the WordCount logic.
-
-The server aggregates word counts from all clients and prints the total word count.
-
-
-
-
-
 
 System Architecture:
 Server (S):
