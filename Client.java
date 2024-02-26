@@ -22,11 +22,10 @@ public class Client {
             String filePath = reader.readLine();
 
             int wordCount = WordCount.wordCount(filePath);
-            String wordCount2 = String.valueOf(wordCount);
             System.out.println("Number of words in the file: " + wordCount);
 
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-            writer.println(wordCount2);
+            writer.println(String.valueOf(wordCount));
             writer.flush();
             writer.close();
             socket.close();

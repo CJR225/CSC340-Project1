@@ -15,19 +15,26 @@ public class Server {
 
             byte[] originalFileContent = Files.readAllBytes(Paths.get(originalFileName));
             int segmentSize = originalFileContent.length / numberOfClients;
+            int lastIndexUsed = 0;
 
             for (int i = 0; i < numberOfClients; i++) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Client connected: " + (i + 1) + "/" + numberOfClients);
 
-                    int startIndex = i * segmentSize;
-                    int endIndex;
-                    if (i == numberOfClients - 1) {
-                        endIndex = originalFileContent.length;
-                    } else {
+                    int startIndex = lastIndexUsed;
+                    int endIndex = originalFileContent.length;
+
+                    if (i < numberOfClients - 1) {
                         endIndex = (i + 1) * segmentSize;
+                        while (endIndex > startIndex && originalFileContent[endIndex - 1] != ' '
+                                && originalFileContent[endIndex - 1] != '\n') {
+                            endIndex--;
+                        }
                     }
+
+                    lastIndexUsed = endIndex;
+
                     byte[] segment = extractSegment(originalFileContent, startIndex, endIndex);
 
                     String segmentFileName = "segment_" + i + ".txt";
