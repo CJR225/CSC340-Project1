@@ -37,11 +37,7 @@ public class Server {
 
                     byte[] segment = extractSegment(originalFileContent, startIndex, endIndex);
 
-                    String segmentFileName = "segment_" + i + ".txt";
-                    saveToFile(segmentFileName, segment);
-
-                    // sendFileNameToClient(clientSocket, segmentFileName);
-                    sendFileClient(clientSocket, new File(segmentFileName));
+                    sendFileToClient(clientSocket, segment);
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     String wordCountStr = in.readLine();
@@ -67,7 +63,6 @@ public class Server {
             System.out.println("An error occurred starting the server.");
             e.printStackTrace();
         }
-
     }
 
     private static byte[] extractSegment(byte[] fileContent, int startIndex, int endIndex) {
@@ -77,28 +72,10 @@ public class Server {
         return segment;
     }
 
-    private static void saveToFile(String fileName, byte[] content) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            fos.write(content);
+    private static void sendFileToClient(Socket clientSocket, byte[] fileContent) throws IOException {
+        try (BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream())) {
+            bos.write(fileContent, 0, fileContent.length);
+            bos.flush();
         }
-    }
-
-    private static void sendFileClient(Socket clientSocket, File file) throws IOException {
-        byte[] bytes = new byte[4096];
-        InputStream in = new FileInputStream(file);
-        OutputStream out = clientSocket.getOutputStream();
-
-        int count;
-        while ((count = in.read(bytes)) > 0) {
-            out.write(bytes, 0, count);
-        }
-        in.close();
-        // Signal the end of file transmission
-        clientSocket.shutdownOutput();
-    }
-
-    private static void sendFileNameToClient(Socket clientSocket, String fileName) throws IOException {
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(fileName);
     }
 }
