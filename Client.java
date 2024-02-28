@@ -25,7 +25,6 @@ public class Client {
             
             InputStream inputStream = socket.getInputStream();
             byte[] content = readFromSocket(inputStream);
-
             saveToFile(fileName, content);
 
             int wordCount = WordCount.wordCount("segment_0.txt");
@@ -48,11 +47,14 @@ public class Client {
     }
 
     private static byte[] readFromSocket(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int bytesRead;
         while ((bytesRead = inputStream.read(buffer)) != -1) {
             outputStream.write(buffer, 0, bytesRead);
+            if (inputStream.available() == 0) {
+                break;
+            }
         }
         return outputStream.toByteArray();
     }

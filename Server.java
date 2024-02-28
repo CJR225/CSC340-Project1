@@ -36,7 +36,6 @@ public class Server {
                     lastIndexUsed = endIndex;
 
                     byte[] segment = extractSegment(originalFileContent, startIndex, endIndex);
-
                     sendFileToClient(clientSocket, segment);
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -57,7 +56,6 @@ public class Server {
                     e.printStackTrace();
                 }
             }
-
             System.out.println("Total word count from all clients: " + totalWordCount);
         } catch (IOException e) {
             System.out.println("An error occurred starting the server.");
@@ -73,9 +71,12 @@ public class Server {
     }
 
     private static void sendFileToClient(Socket clientSocket, byte[] fileContent) throws IOException {
-        try (BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream())) {
+    	try {
+            BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream());
             bos.write(fileContent, 0, fileContent.length);
             bos.flush();
+        } catch (IOException e) {
+            System.err.println("Error occurred while sending file to client: " + e.getMessage());
         }
     }
 }
