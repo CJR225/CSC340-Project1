@@ -37,10 +37,7 @@ public class Server {
 
                     byte[] segment = extractSegment(originalFileContent, startIndex, endIndex);
 
-                    String segmentFileName = "segment_" + i + ".txt";
-                    saveToFile(segmentFileName, segment);
-
-                    sendFileNameToClient(clientSocket, segmentFileName);
+                    sendFileToClient(clientSocket, segment);
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     String wordCountStr = in.readLine();
@@ -75,14 +72,10 @@ public class Server {
         return segment;
     }
 
-    private static void saveToFile(String fileName, byte[] content) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            fos.write(content);
+    private static void sendFileToClient(Socket clientSocket, byte[] fileContent) throws IOException {
+        try (BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream())) {
+            bos.write(fileContent, 0, fileContent.length);
+            bos.flush();
         }
-    }
-
-    private static void sendFileNameToClient(Socket clientSocket, String fileName) throws IOException {
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(fileName);
     }
 }
