@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -12,23 +15,22 @@ public class Client {
         try (Socket socket = new Socket(serverIP, serverPort)) {
             System.out.println("Connected to server.");
 
-            // try {
-            // Thread.sleep(10000);
-            // } catch (InterruptedException e) {
-            // e.printStackTrace();
-            // }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String filePath = reader.readLine();
-
-            int wordCount = WordCount.wordCount(filePath);
+            InputStream in = socket.getInputStream();
+            File targetFile = new File("received_file.txt");
+            try (FileOutputStream fileOut = new FileOutputStream(targetFile)) {
+                byte[] bytes = new byte[4096];
+                int count;
+                while ((count = in.read(bytes)) > 0) {
+                    fileOut.write(bytes, 0, count);
+                }
+            }
+            int wordCount = WordCount.wordCount("received_file.txt");
             System.out.println("Number of words in the file: " + wordCount);
 
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-            writer.println(String.valueOf(wordCount));
-            writer.flush();
-            writer.close();
-            socket.close();
+            try (PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+                writer.println(wordCount);
+                writer.flush();
+            } // Auto-close writer here
         } catch (IOException e) {
             e.printStackTrace();
         }

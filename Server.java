@@ -40,8 +40,8 @@ public class Server {
                     String segmentFileName = "segment_" + i + ".txt";
                     saveToFile(segmentFileName, segment);
 
-                    sendFileNameToClient(clientSocket, segmentFileName);
-                    // sendFileClient(clientSocket, new File(segmentFileName));
+                    // sendFileNameToClient(clientSocket, segmentFileName);
+                    sendFileClient(clientSocket, new File(segmentFileName));
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     String wordCountStr = in.readLine();
@@ -67,6 +67,7 @@ public class Server {
             System.out.println("An error occurred starting the server.");
             e.printStackTrace();
         }
+
     }
 
     private static byte[] extractSegment(byte[] fileContent, int startIndex, int endIndex) {
@@ -78,14 +79,22 @@ public class Server {
 
     private static void saveToFile(String fileName, byte[] content) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
-
             fos.write(content);
         }
     }
 
     private static void sendFileClient(Socket clientSocket, File file) throws IOException {
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(file);
+        byte[] bytes = new byte[4096];
+        InputStream in = new FileInputStream(file);
+        OutputStream out = clientSocket.getOutputStream();
+
+        int count;
+        while ((count = in.read(bytes)) > 0) {
+            out.write(bytes, 0, count);
+        }
+        in.close();
+        // Signal the end of file transmission
+        clientSocket.shutdownOutput();
     }
 
     private static void sendFileNameToClient(Socket clientSocket, String fileName) throws IOException {
