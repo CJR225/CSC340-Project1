@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +17,6 @@ public class Client {
         try (Socket socket = new Socket(serverIP, serverPort)) {
             System.out.println("Connected to server.");
 
-            // try {
-            // Thread.sleep(10000);
-            // } catch (InterruptedException e) {
-            // e.printStackTrace();
-            // }
-
-            
             InputStream inputStream = socket.getInputStream();
             byte[] content = readFromSocket(inputStream);
             saveToFile(fileName, content);
@@ -32,7 +26,6 @@ public class Client {
 
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             writer.println(String.valueOf(wordCount));
-            writer.flush();
             writer.close();
             socket.close();
         } catch (IOException e) {
@@ -47,15 +40,18 @@ public class Client {
     }
 
     private static byte[] readFromSocket(InputStream inputStream) throws IOException {
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-            if (inputStream.available() == 0) {
+        DataInputStream dis = new DataInputStream(inputStream);
+        int size = dis.readInt();
+        byte[] data = new byte[size];
+
+        int totalBytesRead = 0;
+        while (totalBytesRead < size) {
+            int bytesRead = dis.read(data, totalBytesRead, size - totalBytesRead);
+            if (bytesRead == -1) {
                 break;
             }
+            totalBytesRead += bytesRead;
         }
-        return outputStream.toByteArray();
+        return data;
     }
 }

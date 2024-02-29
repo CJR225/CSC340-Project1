@@ -71,12 +71,9 @@ public class Server {
     }
 
     private static void sendFileToClient(Socket clientSocket, byte[] fileContent) throws IOException {
-    	try {
-            BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream());
-            bos.write(fileContent, 0, fileContent.length);
-            bos.flush();
-        } catch (IOException e) {
-            System.err.println("Error occurred while sending file to client: " + e.getMessage());
-        }
+        DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+        dos.writeInt(fileContent.length);
+        dos.write(fileContent, 0, fileContent.length);
+        dos.flush();
     }
 }
