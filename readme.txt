@@ -44,6 +44,3 @@ Scalability and Optimization:
 Consider scalability issues as the number of clients increases.
 Optimize the system for performance, considering factors like load balancing and efficient resource utilization.
 Documentation:
-
-Document your system architecture, communication protocol, and implementation details.
-Provide clear instructions on how to set up and run the distributed computing system.
